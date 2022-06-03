@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+    {% block content %}
+    <h1><strong>{{ title }}</strong></h1>
+
+    <div class="content-section tp-3">
+        {{ league_name }}
+        {% for table in tables %}
+            {{ table|safe }}
+        {% endfor %}
+    </div>
+    <p>Click the "Show breakdown" button to toggle between hiding and showing the weekly lowest scorer</p>
+    <button onclick="showResults()">Show breakdown</button>
+
+        <div id="results" style="display : none">
+            <h3><strong>Here is a breakdown of the lowest player of each week!</strong></h3>
+                {% for l in lowest_comments %}
+                    <p>{{ l }}</p>
+                {% endfor %}
+        </div>
+        <div class="pt-3">
+            <h3>
+                Here is how much each player owes!
+            </h3>
+            {% for key, value in amount_owed.items() %}
+            <strong>{{ key }} : {{ value }}</strong>
+            <br>
+            {% endfor %}
+        </div>
+
+    <script>
+    function showResults() {
+      var x = document.getElementById("results");
+      if (x.style.display === "none") {
+        x.style.display = "block";
+      } else {
+        x.style.display = "none";
+      }
+    }
+    </script>
+    {% endblock content %}
+

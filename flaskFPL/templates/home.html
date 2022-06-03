@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+    {% block content %}
+<div class="content-section">
+          <form method ="POST" action="">
+              {{ form.hidden_tag() }}
+              <fieldset class="form-group">
+                  <legend class="border-bottom mb-4" >FPL League Data</legend>
+                  <div class="form-group">
+                      {{ form.league_id.label(class="form-control-label") }}
+
+                      {% if form.league_id.errors %}
+                        {{ form.league_id(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.league_id.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                            {{ form.league_id(class="form-control form-control-lg") }}
+                      {% endif %}
+                  </div>
+                   <div class="form-group">
+                  {{ form.amount_owed.label(class="form-control-label") }}
+
+                  {% if form.amount_owed.errors %}
+                    {{ form.amount_owed(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form2.amount_owed.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                  {% else %}
+                    {{ form.amount_owed(class="form-control form-control-lg") }}
+                  {% endif %}
+              </div>
+              </fieldset>
+              <div class="form-group pt-3">
+                  {{ form.submit(class="btn btn-outline-info") }}
+              </div>
+          </form>
+</div>
+    {% endblock content %}
