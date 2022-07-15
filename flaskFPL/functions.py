@@ -7,7 +7,14 @@ pd.set_option('display.max_columns', None)
 base_url = 'https://fantasy.premierleague.com/api/'
 test_id = 6106451
 test_gw = requests.get(base_url + "/entry/" + str(test_id) + "/history/").json()
-current_week = len(test_gw['current'])
+try:
+    current_week = len(test_gw['current'])
+except KeyError as error:
+    if error:
+        # no_season = True
+        print("Currently off season")
+        quit()
+
 
 
 def get_league_name(lid=0):
@@ -105,7 +112,7 @@ def get_lowest_score(all_managers, gw=0):
     return lowest_player
 
 
-def get_all_lowest(managers, current_gw=current_week):
+def get_all_lowest(managers, current_gw=0):
     names_lowest = []
     gw = 1
     if current_gw == 0:
