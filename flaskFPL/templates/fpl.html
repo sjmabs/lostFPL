@@ -3,7 +3,7 @@
     <h1><strong>{{ title }}</strong></h1>
 
     <div class="content-section tp-3">
-        {{ league_name }}
+<!--        {{ league_name }}-->
         {% for table in tables %}
             {{ table|safe }}
         {% endfor %}
@@ -15,6 +15,12 @@
             <h3><strong>Here is a breakdown of the lowest player of each week!</strong></h3>
                 {% for l in lowest_comments %}
                     <p>{{ l }}</p>
+                {% endfor %}
+                {% for i in second_lowest_comments %}
+                    <p>{{ i }}</p>
+                {% endfor %}
+                {% for j in third_lowest_comments %}
+                    <p>{{ j }}</p>
                 {% endfor %}
         </div>
         <div class="pt-3">

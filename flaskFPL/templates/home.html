@@ -19,7 +19,21 @@
                             {{ form.league_id(class="form-control form-control-lg") }}
                       {% endif %}
                   </div>
-                   <div class="form-group">
+                  <div class="form-group">
+                  {{ form.select_one.label(class="form-control-label") }}
+
+                  {% if form.select_one.errors %}
+                    {{ form.select_one(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.select_one.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                  {% else %}
+                    {{ form.select_one(class="form-control form-control-lg") }}
+                  {% endif %}
+                </div>
+                <div class="form-group">
                   {{ form.amount_owed.label(class="form-control-label") }}
 
                   {% if form.amount_owed.errors %}
@@ -32,7 +46,35 @@
                   {% else %}
                     {{ form.amount_owed(class="form-control form-control-lg") }}
                   {% endif %}
-              </div>
+                </div>
+                <div class="form-group">
+                  {{ form.amount_owed_2.label(class="form-control-label") }}
+
+                  {% if form.amount_owed_2.errors %}
+                    {{ form.amount_owed_2(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.amount_owed_2.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                  {% else %}
+                    {{ form.amount_owed_2(class="form-control form-control-lg") }}
+                  {% endif %}
+                </div>
+                <div class="form-group">
+                  {{ form.amount_owed_3.label(class="form-control-label") }}
+
+                  {% if form.amount_owed_3.errors %}
+                    {{ form.amount_owed_3(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.amount_owed_3.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                  {% else %}
+                    {{ form.amount_owed_3(class="form-control form-control-lg") }}
+                  {% endif %}
+                </div>
               </fieldset>
               <div class="form-group pt-3">
                   {{ form.submit(class="btn btn-outline-info") }}
