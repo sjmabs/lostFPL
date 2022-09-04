@@ -8,17 +8,34 @@
             {{ table|safe }}
         {% endfor %}
     </div>
-    <p>Click the "Show breakdown" button to toggle between hiding and showing the weekly lowest scorer</p>
-    <button onclick="showResults()">Show breakdown</button>
+    <div>
+    <p>Click the "Show breakdown" buttons to toggle between hiding and showing the weekly lowest scorers</p>
+    <button onclick="showResults1()">Show Lowest Breakdown</button>
 
-        <div id="results" style="display : none">
+        <div id="lowest" style="display : none">
             <h3><strong>Here is a breakdown of the lowest player of each week!</strong></h3>
                 {% for l in lowest_comments %}
                     <p>{{ l }}</p>
                 {% endfor %}
+        </div>
+    </div>
+
+    <div>
+    <button onclick="showResults2()">Show Second Lowest Breakdown</button>
+
+        <div id="2ndlowest" style="display : none">
+            <h3><strong>Here is a breakdown of the 2nd lowest player of each week!</strong></h3>
                 {% for i in second_lowest_comments %}
                     <p>{{ i }}</p>
                 {% endfor %}
+        </div>
+    </div>
+
+    <div>
+    <button onclick="showResults3()">Show Third Lowest Breakdown</button>
+
+        <div id="3rdlowest" style="display : none">
+            <h3><strong>Here is a breakdown of the 3rd lowest player of each week!</strong></h3>
                 {% for j in third_lowest_comments %}
                     <p>{{ j }}</p>
                 {% endfor %}
@@ -32,10 +49,30 @@
             <br>
             {% endfor %}
         </div>
-
+    </div>
     <script>
-    function showResults() {
-      var x = document.getElementById("results");
+    function showResults1() {
+      var x = document.getElementById("lowest");
+      if (x.style.display === "none") {
+        x.style.display = "block";
+      } else {
+        x.style.display = "none";
+      }
+    }
+    </script>
+    <script>
+    function showResults2() {
+      var x = document.getElementById("2ndlowest");
+      if (x.style.display === "none") {
+        x.style.display = "block";
+      } else {
+        x.style.display = "none";
+      }
+    }
+    </script>
+    <script>
+    function showResults3() {
+      var x = document.getElementById("3rdlowest");
       if (x.style.display === "none") {
         x.style.display = "block";
       } else {

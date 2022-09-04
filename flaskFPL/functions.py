@@ -64,7 +64,13 @@ def get_gw_scores(uid=0):
     rg = requests.get(base_url + "/entry/" + str(uid) + "/history/").json()
     gameweeks = rg['current']
     gw_scores = {"GW" + str(week['event']): week['points'] for week in gameweeks}
+    # n = 0
+    # while len(gw_scores) < current_week:
+
     gw_scores = natsorted(gw_scores.values())
+    while len(gw_scores) < current_week:
+        gw_scores.insert(0, 0)
+
     return gw_scores
 
 
@@ -222,6 +228,6 @@ def get_amount_owed(a_dict, price=0):
 
 
 
-
+print(get_gw_scores(8144720))
 
 
