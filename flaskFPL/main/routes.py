@@ -1,16 +1,17 @@
 import pandas as pd
 from collections import Counter
 
-from flaskFPL.functions import get_managers, get_league_table, get_league_name, get_gw_scores, get_lowest_score,\
-    get_all_lowest, get_amount_owed, list_to_dict, get_lowest_score_comments, get_all_lowest_comments,\
-    get_all_nth_lowest_comments, current_week, get_all_nth_lowest, get_nth_lowest_score_comments
-from flask import render_template, flash
-from flaskFPL import app
-from flaskFPL.forms import EnterID
+from flaskFPL.main.functions import get_managers, get_league_table, get_league_name, get_all_lowest, get_amount_owed, list_to_dict, \
+    get_all_lowest_comments,\
+    get_all_nth_lowest_comments, latest_gw, get_all_nth_lowest
+from flask import render_template, flash, Blueprint
+from flaskFPL.main.forms import EnterID
+
+main = Blueprint('main', __name__)
 
 
-@app.route('/', methods=['GET', 'POST'])
-@app.route('/home', methods=['GET', 'POST'])
+@main.route('/', methods=['GET', 'POST'])
+@main.route('/home', methods=['GET', 'POST'])
 def home():
     form = EnterID()
     if form.validate_on_submit():
@@ -28,20 +29,20 @@ def home():
         # get the comments for breakdown of lowest scorers
         lowest_comments = get_all_lowest_comments(all_managers)
 
-        second_lowest_comments = get_all_nth_lowest_comments(all_managers, current_week, 1)
+        second_lowest_comments = get_all_nth_lowest_comments(all_managers, latest_gw, 1)
 
-        third_lowest_comments = get_all_nth_lowest_comments(all_managers, current_week, 2)
+        third_lowest_comments = get_all_nth_lowest_comments(all_managers, latest_gw, 2)
 
         # get 2nd lowest comments
-        # second_lowest_comments = get_all_nth_lowest_comments(all_managers, current_week, form.league_id.data)
+        # second_lowest_comments = get_all_nth_lowest_comments(all_managers, latest_gw, form.league_id.data)
 
         # get a list of all lowest players per week
         all_lowest = get_all_lowest(all_managers)
 
         # get all 2nd lowest
-        all_second_lowest = get_all_nth_lowest(all_managers, current_week, 1)
+        all_second_lowest = get_all_nth_lowest(all_managers, latest_gw, 1)
 
-        all_third_lowest = get_all_nth_lowest(all_managers, current_week, 2)
+        all_third_lowest = get_all_nth_lowest(all_managers, latest_gw, 2)
 
         # counts how many times they appear in the previous list
         times_last = list_to_dict(all_lowest)
@@ -87,7 +88,6 @@ def home():
         if int(form.select_one.data) == 1:
             df = df.merge(amount_owed_df, how="outer", right_on='Player Name', left_on='Player Name')
         elif int(form.select_one.data) == 2:
-            print("hitting here")
             times_second_last_df = pd.DataFrame.from_dict(times_second_last, orient='index',
                                          columns=['Times Second Bottom'])
 
@@ -149,12 +149,12 @@ def home():
     return render_template("home.html", title="Home", form=form)
 
 
-@app.route("/about")
+@main.route("/about")
 def about():
     return render_template('about.html', title='About')
 
 
-@app.route('/lowest', methods=['GET', 'POST'])
+@main.route('/lowest', methods=['GET', 'POST'])
 def lowest():
     return render_template("lowest.html", title="Lowest Scorers", legend="Lowest Scorers")
 

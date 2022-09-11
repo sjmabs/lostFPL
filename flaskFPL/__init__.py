@@ -1,7 +1,13 @@
 from flask import Flask
+from flaskFPL.config import Config
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'a0269ebf979cace96d9659222c7102b0'
 
-from flaskFPL import routes
+def create_app(config_class=Config):
+    app = Flask(__name__)
+    app.config.from_object(config_class)
+
+    from flaskFPL.main.routes import main
+    app.register_blueprint(main)
+
+    return app
 

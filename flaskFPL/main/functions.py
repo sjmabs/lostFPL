@@ -1,21 +1,26 @@
 import pandas as pd
 import requests
-from flaskFPL.models import Manager
+from flaskFPL.main.models import Manager
 from natsort import natsorted
-from collections import Counter
 
 pd.set_option('display.max_columns', None)
 base_url = 'https://fantasy.premierleague.com/api/'
-test_id = 6106451
-test_gw = requests.get(base_url + "/entry/" + str(test_id) + "/history/").json()
-try:
-    current_week = len(test_gw['current'])
-    # print(current_week)
-except KeyError as error:
-    if error:
-        # no_season = True
-        print("Currently off season")
-        quit()
+
+
+def finished_week():
+    gws = requests.get('https://fantasy.premierleague.com/api/bootstrap-static/').json()
+    gws1 = gws['events']
+    current_gw = 0
+    for gw in gws1:
+        if gw['finished']:
+            current_gw += 1
+    if current_gw == 0:
+        print("off season")
+        # add an off season page link
+    return current_gw
+
+
+latest_gw = finished_week()
 
 
 def get_league_name(lid=0):
@@ -63,19 +68,20 @@ def get_gw_scores(uid=0):
         uid = input("Enter a User ID: ")
     rg = requests.get(base_url + "/entry/" + str(uid) + "/history/").json()
     gameweeks = rg['current']
+    to_remove = len(gameweeks) - latest_gw
+    while to_remove != 0:
+        gameweeks.pop()
+        to_remove -= 1
     gw_scores = {"GW" + str(week['event']): week['points'] for week in gameweeks}
-    # n = 0
-    # while len(gw_scores) < current_week:
-
     gw_scores = natsorted(gw_scores.values())
-    while len(gw_scores) < current_week:
+    while len(gw_scores) != latest_gw:
         gw_scores.insert(0, 0)
 
     return gw_scores
 
 
 # function below works to get lowest scorer
-def get_lowest_score_comments(all_managers, gw=current_week):
+def get_lowest_score_comments(all_managers, gw=latest_gw):
     low_score = get_lowest_score(all_managers, gw)
     lowest_player = get_lowest_player(all_managers, gw)
     if len(lowest_player) == 1:
@@ -87,7 +93,7 @@ def get_lowest_score_comments(all_managers, gw=current_week):
     return lowest_player_comment
 
 
-def get_nth_lowest_score_comments(all_managers, gw=current_week, n=0):
+def get_nth_lowest_score_comments(all_managers, gw=latest_gw, n=0):
     if n == 0:
         low_score = get_lowest_score(all_managers, gw)
         lowest_player = get_lowest_player(all_managers, gw)
@@ -111,7 +117,7 @@ def get_nth_lowest_score_comments(all_managers, gw=current_week, n=0):
     return lowest_player_comment
 
 
-def get_lowest_player(all_managers, gw=current_week):
+def get_lowest_player(all_managers, gw=latest_gw):
     low_score = get_lowest_score(all_managers, gw)
     lowest_player = []
     for man in all_managers:
@@ -122,7 +128,7 @@ def get_lowest_player(all_managers, gw=current_week):
     return lowest_player
 
 
-def get_nth_lowest_player(all_managers, gw=current_week, n=0):
+def get_nth_lowest_player(all_managers, gw=latest_gw, n=0):
     low_score = get_nth_lowest_score(all_managers, gw, n)
     nth_lowest_player = []
     for man in all_managers:
@@ -133,7 +139,7 @@ def get_nth_lowest_player(all_managers, gw=current_week, n=0):
     return nth_lowest_player
 
 
-def get_lowest_score(all_managers, gw=current_week):
+def get_lowest_score(all_managers, gw=latest_gw):
     low_score = -1
     for man in all_managers:
         if man.scores[gw-1] < low_score or low_score < 0:
@@ -143,7 +149,7 @@ def get_lowest_score(all_managers, gw=current_week):
     return low_score
 
 
-def get_nth_lowest_score(all_managers, gw=current_week, n=0):
+def get_nth_lowest_score(all_managers, gw=latest_gw, n=0):
     all_managers_copy = all_managers.copy()
     if n == 0:
         return get_lowest_score(all_managers, gw)
@@ -158,7 +164,7 @@ def get_nth_lowest_score(all_managers, gw=current_week, n=0):
     return low_score
 
 
-def get_all_lowest(all_managers, current_gw=current_week):
+def get_all_lowest(all_managers, current_gw=latest_gw):
     names_lowest = []
     gw = 1
     final_list = []
@@ -171,7 +177,7 @@ def get_all_lowest(all_managers, current_gw=current_week):
     return final_list
 
 
-def get_all_nth_lowest(all_managers, current_gw=current_week, n=0):
+def get_all_nth_lowest(all_managers, current_gw=latest_gw, n=0):
     names_lowest = []
     gw = 1
     final_list = []
@@ -184,7 +190,7 @@ def get_all_nth_lowest(all_managers, current_gw=current_week, n=0):
     return final_list
 
 
-def get_all_lowest_comments(managers, current_gw=current_week):
+def get_all_lowest_comments(managers, current_gw=latest_gw):
     names_lowest = []
     gw = 1
     final_list = []
@@ -197,7 +203,7 @@ def get_all_lowest_comments(managers, current_gw=current_week):
     return names_lowest
 
 
-def get_all_nth_lowest_comments(managers, current_gw=current_week, n=0):
+def get_all_nth_lowest_comments(managers, current_gw=latest_gw, n=0):
     names_lowest = []
     gw = 1
     final_list = []
@@ -226,8 +232,5 @@ def get_amount_owed(a_dict, price=0):
     return new_dict
 
 
-
-
-print(get_gw_scores(8144720))
 
 
