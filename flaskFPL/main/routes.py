@@ -23,11 +23,6 @@ def home():
         # league name for showing on page
         league_name = get_league_name(form.league_id.data)
 
-        # if game is being updated - app won't work. Need to redirect to custom error page
-        if league_name == "The game is being updated.":
-            return render_template("home.html", title="Home", form=form)
-
-
         # get the objects of each manager
         all_managers = get_managers(form.league_id.data)
 
