@@ -8,6 +8,8 @@ def create_app(config_class=Config):
 
     from flaskFPL.main.routes import main
     app.register_blueprint(main)
+    from flaskFPL.errors.handlers import errors
+    app.register_blueprint(errors)
 
     return app
 

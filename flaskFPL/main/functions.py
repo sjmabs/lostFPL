@@ -231,6 +231,3 @@ def get_amount_owed(a_dict, price=0):
         new_dict[key] *= float(price)
     return new_dict
 
-
-
-
