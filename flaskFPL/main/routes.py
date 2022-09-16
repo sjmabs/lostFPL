@@ -138,6 +138,24 @@ def home():
                                 right_on='Player Name', left_on='Player Name')
 
         df = df.fillna(0)
+        df = df[df["Player Name"].str.contains("Nobody") == False]
+
+        if int(form.select_one.data) == 1:
+            return render_template("fpl.html",
+                                   title=f"League Data for {league_name}",
+                                   tables=[df.to_html(classes='data', index=False)],
+                                   titles=df.columns.values, form=form, all_lowest=all_lowest,
+                                   amount_owed=amount_owed,
+                                   lowest_comments=lowest_comments, league_name=league_name)
+
+        elif int(form.select_one.data) == 2:
+            return render_template("fpl.html",
+                                   title=f"League Data for {league_name}",
+                                   tables=[df.to_html(classes='data', index=False)],
+                                   titles=df.columns.values, form=form, all_lowest=all_lowest,
+                                   amount_owed=amount_owed,
+                                   lowest_comments=lowest_comments, league_name=league_name,
+                                   second_lowest_comments=second_lowest_comments)
 
         return render_template("fpl.html",
                                title=f"League Data for {league_name}", tables=[df.to_html(classes='data', index=False)],

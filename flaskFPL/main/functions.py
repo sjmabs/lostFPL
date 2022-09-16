@@ -73,10 +73,6 @@ def get_gw_scores(uid=0):
         gameweeks.pop()
         to_remove -= 1
     gw_scores = {"GW" + str(week['event']): week['points'] for week in gameweeks}
-    gw_scores = natsorted(gw_scores.values())
-    while len(gw_scores) != latest_gw:
-        gw_scores.insert(0, 0)
-
     return gw_scores
 
 
@@ -109,11 +105,17 @@ def get_nth_lowest_score_comments(all_managers, gw=latest_gw, n=0):
     else:
         suffix = "th"
     if len(lowest_player) == 1:
-        lowest_player_comment = " ".join(lowest_player) + " was " + str(n+1) + suffix + " lowest of GW" + str(gw)\
-                                + " with a score of " + str(low_score)
+        if lowest_player == ["Nobody"]:
+            lowest_player_comment = " ".join(lowest_player) + " was " + str(n+1) + suffix + " lowest of GW" + str(gw)
+        else:
+            lowest_player_comment = " ".join(lowest_player) + " was " + str(n+1) + suffix + " lowest of GW" + str(gw)\
+                                    + " with a score of " + str(low_score)
+    elif len(lowest_player) == len(all_managers):
+        lowest_player_comment = "All were lowest of GW" + str(gw) + " with a score of " + str(low_score)
     else:
         l_players = ", ".join(lowest_player[:-1]) + " and " + lowest_player[-1]
-        lowest_player_comment = l_players + " were " + str(n+1) + suffix + " lowest of GW" + str(gw) + " with a score of " + str(low_score)
+        lowest_player_comment = l_players + " were " + str(n+1) + suffix + " lowest of GW" + str(gw) \
+            + " with a score of " + str(low_score)
     return lowest_player_comment
 
 
@@ -121,7 +123,7 @@ def get_lowest_player(all_managers, gw=latest_gw):
     low_score = get_lowest_score(all_managers, gw)
     lowest_player = []
     for man in all_managers:
-        if man.scores[gw-1] == low_score:
+        if man.scores[f"GW{gw}"] == low_score:
             lowest_player.append(man.name)
         else:
             pass
@@ -132,18 +134,20 @@ def get_nth_lowest_player(all_managers, gw=latest_gw, n=0):
     low_score = get_nth_lowest_score(all_managers, gw, n)
     nth_lowest_player = []
     for man in all_managers:
-        if man.scores[gw-1] == low_score:
+        if man.scores[f"GW{gw}"] == low_score:
             nth_lowest_player.append(man.name)
         else:
             pass
+    if not nth_lowest_player:
+        nth_lowest_player = ["Nobody"]
     return nth_lowest_player
 
 
 def get_lowest_score(all_managers, gw=latest_gw):
     low_score = -1
     for man in all_managers:
-        if man.scores[gw-1] < low_score or low_score < 0:
-            low_score = man.scores[gw-1]
+        if man.scores[f"GW{gw}"] <= low_score or low_score == -1:
+            low_score = man.scores[f"GW{gw}"]
         else:
             pass
     return low_score
@@ -155,8 +159,11 @@ def get_nth_lowest_score(all_managers, gw=latest_gw, n=0):
         return get_lowest_score(all_managers, gw)
     low_score = get_lowest_score(all_managers, gw)
     for man in all_managers:
-        if man.scores[gw - 1] == low_score:
+        if man.scores[f"GW{gw}"] == low_score:
             all_managers_copy.remove(man)
+    if not all_managers_copy:
+        low_score = -1
+        return low_score
     if n == 2:
         low_score = get_nth_lowest_score(all_managers_copy, gw, n+1)
     else:

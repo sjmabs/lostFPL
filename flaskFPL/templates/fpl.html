@@ -19,7 +19,7 @@
                 {% endfor %}
         </div>
     </div>
-
+    {% if second_lowest_comments or third_lowest_comments %}
     <div>
     <button onclick="showResults2()">Show Second Lowest Breakdown</button>
 
@@ -30,7 +30,8 @@
                 {% endfor %}
         </div>
     </div>
-
+    {% endif %}
+    {% if third_lowest_comments %}
     <div>
     <button onclick="showResults3()">Show Third Lowest Breakdown</button>
 
@@ -45,11 +46,14 @@
                 Here is how much each player owes!
             </h3>
             {% for key, value in amount_owed.items() %}
+            {% if key != "Nobody" %}
             <strong>{{ key }} : {{ value }}</strong>
+            {% endif %}
             <br>
             {% endfor %}
         </div>
     </div>
+    {% endif %}
     <script>
     function showResults1() {
       var x = document.getElementById("lowest");
