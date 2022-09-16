@@ -149,14 +149,8 @@ def home():
     return render_template("home.html", title="Home", form=form)
 
 
-@main.route("/about")
-def about():
-    return render_template('about.html', title='About')
 
 
-@main.route('/lowest', methods=['GET', 'POST'])
-def lowest():
-    return render_template("lowest.html", title="Lowest Scorers", legend="Lowest Scorers")
 
 
 
