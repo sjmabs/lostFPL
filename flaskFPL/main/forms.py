@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, TextAreaField, IntegerField, SelectField, DecimalField
+from wtforms import StringField, SubmitField, TextAreaField, IntegerField, SelectField
 from wtforms.validators import DataRequired, ValidationError
 import requests
 
@@ -13,11 +13,11 @@ class PostForm(FlaskForm):
 
 class EnterID(FlaskForm):
     league_id = IntegerField('League ID', validators=[DataRequired()])
-    amount_owed = DecimalField('Enter the amount a player owes for finishing last for the week',
-                               validators=[DataRequired()])
-    amount_owed_2 = DecimalField('Enter the amount a player owes for finishing second last for the week',
+    amount_owed = IntegerField('Enter the amount a player owes for finishing last for the week',
                                default=0)
-    amount_owed_3 = DecimalField('Enter the amount a player owes for finishing third last for the week',
+    amount_owed_2 = IntegerField('Enter the amount a player owes for finishing second last for the week',
+                               default=0)
+    amount_owed_3 = IntegerField('Enter the amount a player owes for finishing third last for the week',
                                default=0)
     options = ["1", "2", "3"]
     select_one = SelectField(u"How many bottom scorers?", choices=options)
