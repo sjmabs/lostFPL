@@ -1,7 +1,7 @@
 import pandas as pd
 import requests
 from flaskFPL.main.models import Manager
-from natsort import natsorted
+import math
 
 pd.set_option('display.max_columns', None)
 base_url = 'https://fantasy.premierleague.com/api/'
@@ -235,7 +235,7 @@ def list_to_dict(a_list):
 def get_amount_owed(a_dict, price=0):
     new_dict = dict(a_dict)
     for key in new_dict:
-        new_dict[key] *= float(price)
+        new_dict[key] *= price
     return new_dict
 
 
