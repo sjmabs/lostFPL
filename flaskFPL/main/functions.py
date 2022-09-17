@@ -83,6 +83,8 @@ def get_lowest_score_comments(all_managers, gw=latest_gw):
     if len(lowest_player) == 1:
         lowest_player_comment = " ".join(lowest_player) + " was lowest of GW" + str(gw)\
                                 + " with a score of " + str(low_score)
+    elif len(lowest_player) == len(all_managers):
+        lowest_player_comment = "All were lowest of GW" + str(gw) + " with a score of " + str(low_score)
     else:
         l_players = ", ".join(lowest_player[:-1]) + " and " + lowest_player[-1]
         lowest_player_comment = l_players + " were lowest of GW" + str(gw) + " with a score of " + str(low_score)
@@ -110,8 +112,6 @@ def get_nth_lowest_score_comments(all_managers, gw=latest_gw, n=0):
         else:
             lowest_player_comment = " ".join(lowest_player) + " was " + str(n+1) + suffix + " lowest of GW" + str(gw)\
                                     + " with a score of " + str(low_score)
-    elif len(lowest_player) == len(all_managers):
-        lowest_player_comment = "All were lowest of GW" + str(gw) + " with a score of " + str(low_score)
     else:
         l_players = ", ".join(lowest_player[:-1]) + " and " + lowest_player[-1]
         lowest_player_comment = l_players + " were " + str(n+1) + suffix + " lowest of GW" + str(gw) \
@@ -237,4 +237,5 @@ def get_amount_owed(a_dict, price=0):
     for key in new_dict:
         new_dict[key] *= float(price)
     return new_dict
+
 

@@ -1,8 +1,9 @@
 import pandas as pd
 from collections import Counter
 
-from flaskFPL.main.functions import get_managers, get_league_table, get_league_name, get_all_lowest, get_amount_owed, list_to_dict, \
-    get_all_lowest_comments,\
+from flaskFPL.main.functions import get_managers, get_league_table, get_league_name, get_all_lowest, get_amount_owed, \
+    list_to_dict, \
+    get_all_lowest_comments, \
     get_all_nth_lowest_comments, latest_gw, get_all_nth_lowest
 from flask import render_template, flash, Blueprint
 from flaskFPL.main.forms import EnterID
@@ -49,6 +50,7 @@ def home():
 
         times_second_last = list_to_dict(all_second_lowest)
 
+
         times_third_last = list_to_dict(all_third_lowest)
 
         # calculates amount owed based on form input
@@ -62,7 +64,7 @@ def home():
             amount_owed = amount_owed_last
 
         elif int(form.select_one.data) == 2:
-            amount_owed = dict(Counter(amount_owed_last)+Counter(amount_owed_second_last))
+            amount_owed = dict(Counter(amount_owed_last) + Counter(amount_owed_second_last))
 
         elif int(form.select_one.data) == 3:
             amount_owed = dict(
@@ -84,33 +86,21 @@ def home():
 
         df = df1.merge(times_last_df, how="outer", right_on='Player Name', left_on='Player Name')
 
+
         # df = df.merge(amount_owed_df, how="outer", right_on='Player Name', left_on='Player Name')
         if int(form.select_one.data) == 1:
             df = df.merge(amount_owed_df, how="outer", right_on='Player Name', left_on='Player Name')
+            df = df.astype(
+                {"ID": "int", "Rank": "int", "Total": "int", "Times Bottom": "int"})
         elif int(form.select_one.data) == 2:
-            times_second_last_df = pd.DataFrame.from_dict(times_second_last, orient='index',
-                                         columns=['Times Second Bottom'])
-
-            times_second_last_df = times_second_last_df.rename_axis('Player Name')
-
-            df = df.merge(times_second_last_df, how="outer", right_on='Player Name', left_on='Player Name')
-
-            amount_owed_second_df = pd.DataFrame.from_dict(amount_owed_second_last, orient='index', columns=["Amount Owed"])
-
-            # rename column
-            amount_owed_second_df = amount_owed_second_df.rename_axis('Player Name')
-            amount_owed_df = amount_owed_df.add(amount_owed_second_df, fill_value=0)
-
-            df = df.merge(amount_owed_df, how="outer", right_on='Player Name', left_on='Player Name')
-            # df = second_df.merge(amount_owed_second_df, how="outer", right_on='Player Name', left_on='Player Name')
-
-        elif int(form.select_one.data) == 3:
             times_second_last_df = pd.DataFrame.from_dict(times_second_last, orient='index',
                                                           columns=['Times Second Bottom'])
 
             times_second_last_df = times_second_last_df.rename_axis('Player Name')
 
-            df = df.merge(times_second_last_df, how="outer", right_on='Player Name', left_on='Player Name')
+            df = df.merge(times_second_last_df, how="outer", right_on='Player Name', left_on='Player Name').fillna(0)
+
+
 
             amount_owed_second_df = pd.DataFrame.from_dict(amount_owed_second_last, orient='index',
                                                            columns=["Amount Owed"])
@@ -118,24 +108,46 @@ def home():
             # rename column
             amount_owed_second_df = amount_owed_second_df.rename_axis('Player Name')
             amount_owed_df = amount_owed_df.add(amount_owed_second_df, fill_value=0)
-            # df = second_df.merge(amount_owed_df, how="outer", right_on='Player Name', left_on='Player Name')
+
+            df = df.merge(amount_owed_df, how="outer", right_on='Player Name', left_on='Player Name')
             # df = second_df.merge(amount_owed_second_df, how="outer", right_on='Player Name', left_on='Player Name')
+            df = df.astype(
+                {"ID": "int", "Rank": "int", "Total": "int", "Times Bottom": "int", "Times Second Bottom": "int"})
+
+        elif int(form.select_one.data) == 3:
+            times_second_last_df = pd.DataFrame.from_dict(times_second_last, orient='index',
+                                                          columns=['Times Second Bottom']).fillna(0)
+
+            times_second_last_df = times_second_last_df.rename_axis('Player Name')
+
+            df = df.merge(times_second_last_df, how="outer", right_on='Player Name', left_on='Player Name').fillna(0)
+
+            amount_owed_second_df = pd.DataFrame.from_dict(amount_owed_second_last, orient='index',
+                                                           columns=["Amount Owed"])
+
+            # rename column
+            amount_owed_second_df = amount_owed_second_df.rename_axis('Player Name')
+            amount_owed_df = amount_owed_df.add(amount_owed_second_df, fill_value=0)
 
             times_third_last_df = pd.DataFrame.from_dict(times_third_last, orient='index',
-                                                          columns=['Times Third Bottom'])
+                                                         columns=['Times Third Bottom']).fillna(0)
 
             times_third_last_df = times_third_last_df.rename_axis('Player Name')
 
-            third_df = df.merge(times_third_last_df, how="outer", right_on='Player Name', left_on='Player Name')
+            third_df = df.merge(times_third_last_df, how="outer", right_on='Player Name', left_on='Player Name').fillna(0)
 
             amount_owed_third_df = pd.DataFrame.from_dict(amount_owed_third_last, orient='index',
-                                                           columns=["Amount Owed"])
+                                                          columns=["Amount Owed"])
             # rename column
             amount_owed_third_df = amount_owed_third_df.rename_axis('Player Name')
             amount_owed_df = amount_owed_df.add(amount_owed_third_df, fill_value=0)
 
             df = third_df.merge(amount_owed_df, how="outer",
                                 right_on='Player Name', left_on='Player Name')
+
+            df = df.astype(
+                {"ID": "int", "Rank": "int", "Total": "int", "Times Bottom": "int", "Times Second Bottom": "int",
+                 "Times Third Bottom": "int"})
 
         df = df.fillna(0)
         df = df[df["Player Name"].str.contains("Nobody") == False]
@@ -149,6 +161,7 @@ def home():
                                    lowest_comments=lowest_comments, league_name=league_name)
 
         elif int(form.select_one.data) == 2:
+
             return render_template("fpl.html",
                                    title=f"League Data for {league_name}",
                                    tables=[df.to_html(classes='data', index=False)],
@@ -165,10 +178,3 @@ def home():
                                second_lowest_comments=second_lowest_comments,
                                third_lowest_comments=third_lowest_comments)
     return render_template("home.html", title="Home", form=form)
-
-
-
-
-
-
-

@@ -41,19 +41,18 @@
                     <p>{{ j }}</p>
                 {% endfor %}
         </div>
-        <div class="pt-3">
-            <h3>
-                Here is how much each player owes!
-            </h3>
-            {% for key, value in amount_owed.items() %}
-            {% if key != "Nobody" %}
-            <strong>{{ key }} : {{ value }}</strong>
-            {% endif %}
-            <br>
-            {% endfor %}
-        </div>
-    </div>
     {% endif %}
+    </div>
+    <div class="pt-3">
+        <h3>Here is how much each player owes</h3>
+        {% for key, value in amount_owed.items() %}
+        {% if key != "Nobody" %}
+        <strong>{{ key }} : {{ value }}</strong>
+        {% endif %}
+        <br>
+        {% endfor %}
+    </div>
+
     <script>
     function showResults1() {
       var x = document.getElementById("lowest");
