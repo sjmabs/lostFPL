@@ -20,6 +20,20 @@
                       {% endif %}
                   </div>
                   <div class="form-group">
+                  {{ form.scores_scorers.label(class="form-control-label") }}
+
+                  {% if form.scores_scorers.errors %}
+                    {{ form.scores_scorers(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.scores_scorers.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                  {% else %}
+                    {{ form.scores_scorers(class="form-control form-control-lg") }}
+                  {% endif %}
+                </div>
+                  <div class="form-group">
                   {{ form.select_one.label(class="form-control-label") }}
 
                   {% if form.select_one.errors %}
@@ -39,7 +53,7 @@
                   {% if form.amount_owed.errors %}
                     {{ form.amount_owed(class="form-control form-control-lg is-invalid") }}
                     <div class="invalid-feedback">
-                        {% for error in form2.amount_owed.errors %}
+                        {% for error in form.amount_owed.errors %}
                             <span>{{ error }}</span>
                         {% endfor %}
                     </div>

@@ -2,14 +2,16 @@
     {% block content %}
     <h1><strong>{{ title }}</strong></h1>
 
-    <div class="content-section tp-3">
-<!--        {{ league_name }}-->
-        {% for table in tables %}
-            {{ table|safe }}
-        {% endfor %}
+    <div class="tableContainer">
+        <table class="table">
+            {% for table in tables %}
+               {{ table|safe }}
+            {% endfor %}
+        </table>
     </div>
-    <div>
+    <div class="container pt-3">
     <p>Click the "Show breakdown" buttons to toggle between hiding and showing the weekly lowest scorers</p>
+
     <button onclick="showResults1()">Show Lowest Breakdown</button>
 
         <div id="lowest" style="display : none">
@@ -20,7 +22,7 @@
         </div>
     </div>
     {% if second_lowest_comments or third_lowest_comments %}
-    <div>
+    <div class="container pt-3">
     <button onclick="showResults2()">Show Second Lowest Breakdown</button>
 
         <div id="2ndlowest" style="display : none">
@@ -32,7 +34,7 @@
     </div>
     {% endif %}
     {% if third_lowest_comments %}
-    <div>
+    <div class="container pt-3">
     <button onclick="showResults3()">Show Third Lowest Breakdown</button>
 
         <div id="3rdlowest" style="display : none">
@@ -43,7 +45,7 @@
         </div>
     {% endif %}
     </div>
-    <div class="pt-3">
+    <div class="container pt-3">
         <h3>Here is how much each player owes</h3>
         {% for key, value in amount_owed.items() %}
         {% if key != "Nobody" %}

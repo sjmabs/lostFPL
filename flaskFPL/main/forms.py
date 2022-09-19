@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, TextAreaField, IntegerField, SelectField
+from wtforms import StringField, SubmitField, TextAreaField, IntegerField, SelectField, RadioField
 from wtforms.validators import DataRequired, ValidationError
 import requests
 
@@ -13,6 +13,9 @@ class PostForm(FlaskForm):
 
 class EnterID(FlaskForm):
     league_id = IntegerField('League ID', validators=[DataRequired()])
+    scores_scorers_options = ['Scores - This will run until all lowest scores have been found',
+                              "Scorers - This will stop once your number of scorers has been found"]
+    scores_scorers = SelectField('Would you like bottom scores or scorers?', choices=scores_scorers_options)
     amount_owed = IntegerField('Enter the amount a player owes for finishing last for the week',
                                default=0)
     amount_owed_2 = IntegerField('Enter the amount a player owes for finishing second last for the week',
@@ -20,7 +23,7 @@ class EnterID(FlaskForm):
     amount_owed_3 = IntegerField('Enter the amount a player owes for finishing third last for the week',
                                default=0)
     options = ["1", "2", "3"]
-    select_one = SelectField(u"How many bottom scorers?", choices=options)
+    select_one = SelectField(u"How many bottom scores/scorers?", choices=options)
 
     submit = SubmitField('Get league info')
 

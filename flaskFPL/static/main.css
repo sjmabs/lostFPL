@@ -12,21 +12,31 @@ h1, h2, h3, h4, h5, h6 {
   background-color: #5f788a;
 }
 
-.site-header .navbar-nav .nav-link {
+.site-header .navbar-nav .footer-foot .nav-link .footer-link {
   color: #cbd5db;
 }
 
-.site-header .navbar-nav .nav-link:hover {
+.site-header .navbar-nav .nav-link:hover .footer-link:hover {
   color: #ffffff;
 }
 
-.site-header .navbar-nav .nav-link.active {
+.site-header .navbar-nav .footer-foot .nav-link.active .footer-link.active {
   font-weight: 500;
+}
+
+.tableContainer {
+    overflow: hidden;
+    width: 800px;
+}
+.table {
+    position: sticky;
+    top: 0;
+    width: 100%;
 }
 
 .content-section {
   background: #ffffff;
-  padding: 10px 20px;
+  padding: 5px 10px;
   border: 1px solid #dddddd;
   border-radius: 3px;
   margin-bottom: 20px;
@@ -79,3 +89,4 @@ a.article-title:hover {
 .account-heading {
   font-size: 2.5rem;
 }
+
