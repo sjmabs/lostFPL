@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+    {% block content %}
+        <div class="container">
+            <h1>{{ title }}</h1>
+        </div>
+        <div class="content-section">
+            <p>
+                Lost FPL was created as a quick way for me and my friends to see who had the lowest score of the week.<br><br>
+                It is a way for us to keep Fantasy Premier League more interesting throughout the year as we battle to avoid paying fines for finishing with the bottom score each week.
+                <br>
+                <br>
+                This makes players more engaged with updating their teams and continuing to play even though they may not be on the overall top spot.
+            </p>
+            <p>
+                You can use this tool in a similar way and tailor it to suit your needs.
+                <br>
+                <br>
+                All you need is your League ID and you can begin tracking who <strong>Lost FPL</strong> each week.
+                <br>
+                <br>
+                A guide to find your League ID can be found <a href="{{ url_for('main.LeagueID') }}">here</a> or by clicking on the quick link <i>"How To Find Your League ID"</i>.
+            </p>
+            <p>
+                There are a couple of options available to you when submitting the form.
+                <br>
+                <br>
+                <strong>Scores</strong> or <strong>Scorers</strong>?
+                <br>
+                <br>
+                <strong>Scores</strong> means it will return the players that have the bottom scorers ignoring how many players are included in this result.
+                <br>
+                <br>
+                For example, You may have 2 players on 20 points, 2 players on 30 and 5 players on 40 points. If you select bottom 3 <strong>Scores</strong>, this will return
+                a result telling you that 2 people were the bottom score, 2 people were 2nd lowest and 5 players were 3rd lowest.
+                <br>
+                <br>
+                <strong>Scorers</strong> will return the bottom amount of scorers in your selection.
+                <br>
+                <br>
+                Taking the same example as above, if you ask for the bottom 3 <strong>Scorers</strong> it will only return you a result saying that the 2 players on 20 points were bottom
+                and the 2 players on 30 points were 2nd bottom. It will tell you that nobody came 3rd bottom that week as the number of players you asked for had already been satisfied.
+            </p>
+
+        </div>
+    {% endblock %}
+
