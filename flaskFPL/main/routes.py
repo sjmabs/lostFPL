@@ -1,9 +1,10 @@
+import time
+
 import pandas as pd
 from collections import Counter
 
-from flaskFPL.main.functions import get_managers, get_league_table, get_league_name, get_amount_owed, \
-    list_to_dict, \
-    get_all_nth_lowest_comments, latest_gw, get_all_nth_lowest, \
+from flaskFPL.main.functions import get_managers, get_league_data, get_amount_owed, \
+    list_to_dict, get_nth_lowest_info, get_nth_lowest, latest_week, get_all_nth_lowest, \
     get_all_nth_lowest_comments_scorer, \
     get_all_nth_lowest_scorer
 
@@ -19,48 +20,52 @@ main = Blueprint('main', __name__)
 def home():
     form = EnterID()
     if form.validate_on_submit():
-
-        flash(f"Retrieved data for {get_league_name(form.league_id.data)}!", "success")
+        start = time.time()
+        league_data = get_league_data(form.league_id.data)
+        # league name for showing on page
+        league_name = league_data['league_name']
+        flash(f"Retrieved data for {league_data['league_name']}!", "success")
 
         # get basic league table
-        df1 = get_league_table(form.league_id.data)
+        df1 = league_data['league_table']
 
-        # league name for showing on page
-        league_name = get_league_name(form.league_id.data)
 
         # get the objects of each manager
         all_managers = get_managers(form.league_id.data)
         start_length = len(all_managers)
+
+        # won't need this now
         lowest_comments = get_all_nth_lowest_comments(all_managers)
-
         all_lowest = get_all_nth_lowest(all_managers)
-
         times_last = list_to_dict(all_lowest)
 
         # calculates amount owed based on form input
+        #won't need this now
         amount_owed_last = get_amount_owed(times_last, form.amount_owed.data)
 
         if "Scores" in form.scores_scorers.data:
             # get the comments for breakdown of lowest scorers
 
-            if int(form.select_one.data) >= 2:
-                second_lowest_comments = get_all_nth_lowest_comments(all_managers, latest_gw, 1)
-                all_second_lowest = get_all_nth_lowest(all_managers, latest_gw, 1)
+            data = get_nth_lowest_info(all_managers, latest_week, int(form.select_one.data))
+
+            if int(form.select_one.data) == 2:
+                second_lowest_comments = get_all_nth_lowest_comments(all_managers, latest_week, 1)
+                all_second_lowest = get_all_nth_lowest(all_managers, latest_week, 1)
 
                 times_second_last = list_to_dict(all_second_lowest)
 
                 amount_owed_second_last = get_amount_owed(times_second_last, form.amount_owed_2.data)
                 if int(form.select_one.data) >= 3:
-                    second_lowest_comments = get_all_nth_lowest_comments(all_managers, latest_gw, 1)
-                    all_second_lowest = get_all_nth_lowest(all_managers, latest_gw, 1)
+                    second_lowest_comments = get_all_nth_lowest_comments(all_managers, latest_week, 1)
+                    all_second_lowest = get_all_nth_lowest(all_managers, latest_week, 1)
 
                     times_second_last = list_to_dict(all_second_lowest)
 
                     amount_owed_second_last = get_amount_owed(times_second_last, form.amount_owed_2.data)
 
-                    third_lowest_comments = get_all_nth_lowest_comments(all_managers, latest_gw, 2)
+                    third_lowest_comments = get_all_nth_lowest_comments(all_managers, latest_week, 2)
 
-                    all_third_lowest = get_all_nth_lowest(all_managers, latest_gw, 2)
+                    all_third_lowest = get_all_nth_lowest(all_managers, latest_week, 2)
 
                     times_third_last = list_to_dict(all_third_lowest)
 
@@ -68,26 +73,26 @@ def home():
 
         else:
             if int(form.select_one.data) == 2:
-                second_lowest_comments = get_all_nth_lowest_comments_scorer(all_managers, 2,  latest_gw, 1)
+                second_lowest_comments = get_all_nth_lowest_comments_scorer(all_managers, 2,  latest_week, 1)
 
-                all_second_lowest = get_all_nth_lowest_scorer(all_managers, 2, latest_gw, 1)
+                all_second_lowest = get_all_nth_lowest_scorer(all_managers, 2, latest_week, 1)
 
                 times_second_last = list_to_dict(all_second_lowest)
 
                 amount_owed_second_last = get_amount_owed(times_second_last, form.amount_owed_2.data)
 
             elif int(form.select_one.data) == 3:
-                second_lowest_comments = get_all_nth_lowest_comments_scorer(all_managers, 3, latest_gw, 1)
+                second_lowest_comments = get_all_nth_lowest_comments_scorer(all_managers, 3, latest_week, 1)
 
-                all_second_lowest = get_all_nth_lowest_scorer(all_managers, 3, latest_gw, 1)
+                all_second_lowest = get_all_nth_lowest_scorer(all_managers, 3, latest_week, 1)
 
                 times_second_last = list_to_dict(all_second_lowest)
 
                 amount_owed_second_last = get_amount_owed(times_second_last, form.amount_owed_2.data)
 
-                third_lowest_comments = get_all_nth_lowest_comments_scorer(all_managers, 3, latest_gw, 2)
+                third_lowest_comments = get_all_nth_lowest_comments_scorer(all_managers, 3, latest_week, 2)
 
-                all_third_lowest = get_all_nth_lowest_scorer(all_managers, 3, latest_gw, 2)
+                all_third_lowest = get_all_nth_lowest_scorer(all_managers, 3, latest_week, 2)
 
                 times_third_last = list_to_dict(all_third_lowest)
 
@@ -182,6 +187,10 @@ def home():
         df = df.fillna(0)
         df = df[df["Player Name"].str.contains("Nobody") == False]
         df.drop("ID", inplace=True, axis=1)
+
+        end = time.time()
+
+        print(end - start)
 
         if int(form.select_one.data) == 1:
             return render_template("fpl.html",
