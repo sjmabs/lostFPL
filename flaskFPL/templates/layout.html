@@ -40,7 +40,7 @@
           {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
               {% for category, message in messages %}
-                <div class="alert alert-{{ category }} w-100">
+                <div class="alert text-center alert-{{ category }} w-100">
                   {{ message }}
                 </div>
               {% endfor %}

@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
     {% block content %}
-    <div class="content-section text-center">
+    <div class="content-section col text-center">
         <h1><strong>{{ title }}</strong></h1>
         <div class="container">
             <div class="row justify-content-center">
@@ -27,15 +27,15 @@
         <div class="pt-3 ">
             <p>Click the "Show breakdown" buttons to toggle between hiding and showing the weekly lowest scorers</p>
         </div>
-        <div class="container pt-3">
-            <button onclick="showResults1()">Show Lowest Breakdown</button>
-            <div id="lowest" style="display : none">
-                <h3><strong>Here is a breakdown of the lowest player of each week!</strong></h3>
-                    {% for l in all_comments[0] %}
-                        <p>{{ l }}</p>
-                    {% endfor %}
+            <div class="container pt-3">
+                <button onclick="showResults1()">Show Lowest Breakdown</button>
+                <div id="lowest" style="display : none">
+                    <h3><strong>Here is a breakdown of the lowest player of each week!</strong></h3>
+                        {% for l in all_comments[0] %}
+                            <p>{{ l }}</p>
+                        {% endfor %}
+                </div>
             </div>
-        </div>
 
         {% if all_comments[1] %}
         <div class="container pt-3">
@@ -50,6 +50,8 @@
         </div>
         {% endif %}
 
+
+
         {% if all_comments[2] %}
         <div class="container pt-3">
             <button onclick="showResults3()">Show Third Lowest Breakdown</button>
@@ -60,9 +62,9 @@
                         <p>{{ j }}</p>
                     {% endfor %}
             </div>
+        </div>
         {% endif %}
 
-        </div>
 
     </div>
 
