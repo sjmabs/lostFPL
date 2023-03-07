@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
     {% block content %}
-    <div class="content-section col-md-8">
+    <div class="content-section">
         <h1><strong>{{ title }}</strong></h1>
         <div class="container">
             <div class="row">
@@ -21,32 +21,32 @@
             <button onclick="showResults1()">Show Lowest Breakdown</button>
             <div id="lowest" style="display : none">
                 <h3><strong>Here is a breakdown of the lowest player of each week!</strong></h3>
-                    {% for l in lowest_comments %}
+                    {% for l in all_comments[0] %}
                         <p>{{ l }}</p>
                     {% endfor %}
             </div>
         </div>
 
-        {% if second_lowest_comments or third_lowest_comments %}
+        {% if all_comments[1] or all_comments[2] %}
         <div class="container pt-3">
             <button onclick="showResults2()">Show Second Lowest Breakdown</button>
 
             <div id="2ndlowest" style="display : none">
                 <h3><strong>Here is a breakdown of the 2nd lowest player of each week!</strong></h3>
-                    {% for i in second_lowest_comments %}
+                    {% for i in all_comments[1] %}
                         <p>{{ i }}</p>
                     {% endfor %}
             </div>
         </div>
         {% endif %}
 
-        {% if third_lowest_comments %}
+        {% if all_comments[2] %}
         <div class="container pt-3">
             <button onclick="showResults3()">Show Third Lowest Breakdown</button>
 
             <div id="3rdlowest" style="display : none">
                 <h3><strong>Here is a breakdown of the 3rd lowest player of each week!</strong></h3>
-                    {% for j in third_lowest_comments %}
+                    {% for j in all_comments[2] %}
                         <p>{{ j }}</p>
                     {% endfor %}
             </div>
