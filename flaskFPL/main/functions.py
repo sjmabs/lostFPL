@@ -2,8 +2,6 @@ import pandas as pd
 import requests
 from flaskFPL.main.models import Manager
 
-# pd.set_option('display.max_columns', None)
-
 
 # check the week has finished so that we get fully updated scores
 def finished_week():
@@ -46,8 +44,6 @@ def get_league_data(lid=0):
     return league_data
 
 
-# print(get_league_data(123456)['league_table'])
-
 def get_managers(lid=654321):
     if lid == 0:
         lid = input("Enter league ID: ")
@@ -75,7 +71,7 @@ def get_gw_scores(uid=0):
     return gw_scores
 
 
-# find the lowest score and name or player/players of the week for how ever many the user enters in their selection
+# find the lowest score and name or number of players the user enters in their selection for the given gw
 def get_nth_lowest_info(all_managers, gw=latest_week, n=0):
     gw_scores = []
     # retrieve all players scores for the week
@@ -88,10 +84,11 @@ def get_nth_lowest_info(all_managers, gw=latest_week, n=0):
 
     lowest_info_list = []
     x = 0
-    while x <= n:
+    while x <= int(n):
         # check if list has enough for our requirement and if not assign None
         if len(gw_scores) <= x:
             nth_lowest_score = None
+
         else:
             # else assign the x index score in the list
             nth_lowest_score = gw_scores[x]
@@ -109,18 +106,15 @@ def get_nth_lowest_info(all_managers, gw=latest_week, n=0):
         lowest_info = {f'{x}lowest_score': nth_lowest_score, f'{x}lowest_player': lowest_player}
         lowest_info_list.append(lowest_info)
         x += 1
+    lowest_info_list.append({'gw': gw})
     return lowest_info_list
 
 
-all_managers = get_managers()
-data = get_nth_lowest_info(all_managers, n=2)
-print(data)
-
-def get_nth_lowest_score_comments(data):
-    lowest_info = data
+def get_nth_lowest_score_comments(all_managers, gw, n):
+    lowest_info = get_nth_lowest_info(all_managers, gw, n)
     x = 0
     lowest_player_comments = []
-    while x <= n:
+    while x < len(lowest_info) - 1:
         if x == 0:
             suffix = "st"
         elif x == 1:
@@ -163,20 +157,17 @@ def get_nth_lowest_score_comments(data):
     return lowest_player_comments
 
 
-# print(get_nth_lowest_score_comments(data))
-
-
 # returns a list of lists of players names every time they came nth last. each nth index of list relates to the place
-def get_all_nth_lowest(all_managers, current_gw=latest_week, n=0):
+def get_all_nth_lowest_players(all_managers, current_gw=latest_week, n=0):
     final_list = []
     gw = 1
     # loop through each week
-    while gw <= current_gw: #25
+    while gw <= current_gw:
         x = 0
         # get information on where they came for each week
         info = get_nth_lowest_info(all_managers, gw, n) # returns dictionaries of all lowest people i asked for.
-        while x <= n:
-            if len(final_list) <= n:
+        while x <= int(n):
+            if len(final_list) <= int(n):
                 final_list.append([])
             # put just the names into a list based on their position (x)
             names_lowest = info[x][f'{x}lowest_player']
@@ -187,29 +178,23 @@ def get_all_nth_lowest(all_managers, current_gw=latest_week, n=0):
     return final_list
 
 
-# get_all_nth_lowest(all_managers, current_gw=latest_week, n=2)
-
-
-def get_all_nth_lowest_comments(managers, current_gw=latest_week, n=0):
+def get_all_nth_lowest_comments(all_managers, current_gw=latest_week, n=0):
     final_list = []
     gw = 1
     # loop through each week
-    while gw <= current_gw: #25
+    while gw <= latest_week:
         x = 0
         # get information on where they came for each week
         # info = data
         info = get_nth_lowest_score_comments(all_managers, gw, n) # returns dictionaries of all lowest people i asked for.
-        while x <= n:
-            if len(final_list) <= n:
+        while x <= int(n):
+            if len(final_list) <= int(n):
                 final_list.append([])
-            # put just the names into a list based on their position (x)
+            # put just the comments into a list based on their position (x)
             final_list[x].append(info[x])
             x += 1
         gw += 1
     return final_list
-
-
-# get_all_nth_lowest_comments(all_managers, latest_week, 2)
 
 
 # below converts my list to a dict with counts
@@ -228,90 +213,98 @@ def get_amount_owed(a_dict, price=0):
     return new_dict
 
 
-# how many do we want to get? scores_count. If this is zero then just return the lowest scorer info.
-
-def get_nth_lowest_info_scorer(all_managers, scorers_count=0, gw=latest_week, n=0):
+def get_nth_lowest_info_scorer(all_managers, gw=latest_week, n=0):
     lowest_players = []
-    if scorers_count == 0:
+    if n == 0:
         return get_nth_lowest_info(all_managers, gw, n)
     # if we want to get a number of lowest scorers rather than going by score we have to count how many we currently
     # have and continue to add more until we have the amount we are after.
     x = 0
-    while len(lowest_players) < scorers_count:
+    while len(lowest_players) <= int(n):
         lowest_players.extend(get_nth_lowest_info(all_managers, gw, x)[x][f'{x}lowest_player'])
-        # print(lowest_players)
         x += 1
-    return get_nth_lowest_info(all_managers, gw, x-1)
+
+    info = get_nth_lowest_info(all_managers, gw, x - 1)
+    index = (int(n) + 2) - len(info)
+    i = 1
+    while i <= index:
+        if index == 1 and len(info) != 2:
+            dict_to_merge = {f'{i+1}lowest_score': None, f'{i+1}lowest_player': ['Nobody']}
+            info.insert(i+1, dict_to_merge)
+            i += 1
+        elif index == 1 and len(info) == 2:
+            dict_to_merge = {f'{i}lowest_score': None, f'{i}lowest_player': ['Nobody']}
+            info.insert(i, dict_to_merge)
+            i += 1
+        elif i <= index:
+            dict_to_merge = {f'{i}lowest_score': None, f'{i}lowest_player': ['Nobody']}
+            info.insert(i, dict_to_merge)
+            i += 1
+
+    return info
 
 
-# print(get_nth_lowest_info_scorer(all_managers, 3, 7, 0))
-
-
-def get_nth_lowest_score_comments_scorer(all_managers, scorers_count=0, gw=latest_week, n=0):
-    lowest_info = get_nth_lowest_info_scorer(all_managers, scorers_count, gw, n)
+def get_nth_lowest_score_comments_scorer(all_managers, gw=latest_week, n=0):
+    lowest_info = get_nth_lowest_info_scorer(all_managers, gw, n)
     x = 0
     lowest_player_comments = []
-    while x < scorers_count:
-        try:
-            if x == 0:
-                suffix = "st"
-            elif x == 1:
-                suffix = "nd"
-            elif x == 2:
-                suffix = "rd"
-            else:
-                suffix = "th"
-            if len(lowest_info[x][f'{x}lowest_player']) == 1:
-                if lowest_info[x][f'{x}lowest_player'] == ["Nobody"]:
-                    if x == 0:
-                        lowest_player_comment = " ".join(lowest_info[x][f'{x}lowest_player']) + " was lowest of GW" + str(gw)
-                    else:
-                        lowest_player_comment = " ".join(lowest_info[x][f'{x}lowest_player']) + " was " + str(x + 1) \
-                                                + suffix + " lowest of GW" + str(gw)
+    while x < len(lowest_info) - 1:
+        lowest_player_names = lowest_info[x][f'{x}lowest_player']
+        if x == 0:
+            suffix = "st"
+        elif x == 1:
+            suffix = "nd"
+        elif x == 2:
+            suffix = "rd"
+        else:
+            suffix = "th"
+        if len(lowest_info[x][f'{x}lowest_player']) == 1:
+            if lowest_info[x][f'{x}lowest_player'] == ["Nobody"]:
+                if x == 0:
+                    lowest_player_comment = " ".join(
+                        lowest_info[x][f'{x}lowest_player']) + " was lowest of GW" + str(gw)
                 else:
-                    if x == 0:
-                        lowest_player_comment = " ".join(lowest_info[x][f'{x}lowest_player']) + " was lowest of GW" + str(gw) \
-                                                + " with a score of " + str(lowest_info[x][f'{x}lowest_score'])
-                    else:
-                        lowest_player_comment = " ".join(lowest_info[x][f'{x}lowest_player']) + " was " + str(x + 1) \
-                                                + suffix + " lowest of GW" + str(gw) + " with a score of " \
-                                                + str(lowest_info[x][f'{x}lowest_score'])
-            elif len(lowest_info[x][f'{x}lowest_player']) == len(all_managers):
-                lowest_player_comment = "Everybody was lowest of GW" + str(gw) + " with a score of " \
-                                        + str(lowest_info[x][f'{x}lowest_score'])
+                    lowest_player_comment = " ".join(lowest_info[x][f'{x}lowest_player']) + " was " + str(x + 1) \
+                                            + suffix + " lowest of GW" + str(gw)
             else:
                 if x == 0:
-                    lowest_player_comment = ", ".join(lowest_info[x][f'{x}lowest_player'][:-1]) + " and " \
-                                            + lowest_info[x][f'{x}lowest_player'][-1]\
-                                            + " were lowest of GW" + str(gw) + " with a score of " \
-                                            + str(lowest_info[x][f'{x}lowest_score'])
-                else:
-                    lowest_player_comment = ", ".join(lowest_info[x][f'{x}lowest_player'][:-1]) + " and " \
-                                            + lowest_info[x][f'{x}lowest_player'][-1]\
-                                            + " were " + str(x+1) + suffix + " lowest of GW" + str(gw) \
+                    lowest_player_comment = " ".join(
+                        lowest_info[x][f'{x}lowest_player']) + " was lowest of GW" + str(gw) \
                                             + " with a score of " + str(lowest_info[x][f'{x}lowest_score'])
-            lowest_player_comments.append(lowest_player_comment)
-            x += 1
-        except IndexError as err:
-            x += 1
-            pass
+                else:
+                    lowest_player_comment = " ".join(lowest_info[x][f'{x}lowest_player']) + " was " + str(x + 1) \
+                                            + suffix + " lowest of GW" + str(gw) + " with a score of " \
+                                            + str(lowest_info[x][f'{x}lowest_score'])
+        elif len(lowest_info[x][f'{x}lowest_player']) == len(all_managers):
+            lowest_player_comment = "Everybody was lowest of GW" + str(gw) + " with a score of " \
+                                    + str(lowest_info[x][f'{x}lowest_score'])
+        else:
+            if x == 0:
+                lowest_player_comment = ", ".join(lowest_info[x][f'{x}lowest_player'][:-1]) + " and " \
+                                        + lowest_info[x][f'{x}lowest_player'][-1] \
+                                        + " were lowest of GW" + str(gw) + " with a score of " \
+                                        + str(lowest_info[x][f'{x}lowest_score'])
+            else:
+                lowest_player_comment = ", ".join(lowest_info[x][f'{x}lowest_player'][:-1]) + " and " \
+                                        + lowest_info[x][f'{x}lowest_player'][-1] \
+                                        + " were " + str(x + 1) + suffix + " lowest of GW" + str(gw) \
+                                        + " with a score of " + str(lowest_info[x][f'{x}lowest_score'])
+        lowest_player_comments.append(lowest_player_comment)
+        x += 1
     return lowest_player_comments
 
 
-# print(get_nth_lowest_score_comments_scorer(all_managers, 5, 5, 0))
-
-
-def get_all_nth_lowest_scorer(all_managers, scorer_count, current_gw=latest_week, n=0):
+def get_all_nth_lowest_players_scorer(all_managers, current_gw=latest_week, n=0):
     final_list = []
     gw = 1
     # loop through each week
-    while gw <= current_gw: #25
+    while gw <= current_gw:
         x = 0
         # get information on where they came for each week
-        info = get_nth_lowest_info_scorer(all_managers, scorer_count, gw, n) # returns dictionaries of all lowest people i asked for.
-        while x <= scorer_count:
+        info = get_nth_lowest_info_scorer(all_managers,  gw, n) # returns dictionaries of all lowest people i asked for.
+        while x <= n:
             try:
-                if len(final_list) <= scorer_count:
+                if len(final_list) <= n:
                     final_list.append([])
                 # put just the names into a list based on their position (x)
                 names_lowest = info[x][f'{x}lowest_player']
@@ -326,33 +319,21 @@ def get_all_nth_lowest_scorer(all_managers, scorer_count, current_gw=latest_week
     return final_list
 
 
-# print(get_all_nth_lowest_scorer(all_managers, 3, latest_week, 0))
-
-
-def get_all_nth_lowest_comments_scorer(managers, scorers_count=0, current_gw=latest_week, n=0):
+def get_all_nth_lowest_comments_scorer(all_managers, current_gw=latest_week, n=0):
     final_list = []
     gw = 1
     # loop through each week
-    while gw <= current_gw: #25
+
+    while gw <= latest_week:
         x = 0
         # get information on where they came for each week
-        info = get_nth_lowest_score_comments_scorer(all_managers, scorers_count, gw, n) # returns dictionaries of all lowest people i asked for.
-        while x <= scorers_count:
-            try:
-                if len(final_list) <= scorers_count:
-                    final_list.append([])
-                # put just the names into a list based on their position (x)
-                final_list[x].append(info[x])
-                x += 1
-            except IndexError:
-                x += 1
-                pass
+        info = get_nth_lowest_score_comments_scorer(all_managers, gw, n) # returns dictionaries of all lowest people i asked for.
+        while x <= int(n):
+            if len(final_list) <= int(n):
+                final_list.append([])
+            # put just the comments into a list based on their position (x)
+            final_list[x].append(info[x])
+            x += 1
         gw += 1
-    if not final_list[-1]:
-        final_list.pop()
     return final_list
-
-
-# print(get_all_nth_lowest_comments_scorer(all_managers, 3, latest_week, 0))
-
 
