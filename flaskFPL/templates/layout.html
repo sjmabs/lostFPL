@@ -36,11 +36,11 @@
     </header>
     <main role="main" style="padding-bottom:100px; width:100%;">
       <div class="row">
-        <div class="m-4 center">
+        <div class="m-4 center col">
           {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
               {% for category, message in messages %}
-                <div class="alert alert-{{ category }} w-50">
+                <div class="alert alert-{{ category }} w-100">
                   {{ message }}
                 </div>
               {% endfor %}
@@ -50,7 +50,7 @@
 
           {% endblock %}
         </div>
-        <div class="col-md-4 mr-4 ml-4 center col-sm-pull-right">
+        <div class="ml-4 mr-4 col-md-3 mt-4 col-md-pull-right col-lg-3 center col-lg-pull-right">
           <div class="content-section">
             <h3>LOST FPL Quick Links</h3>
             <p class='text-muted'>Useful links to other sites and pages.
