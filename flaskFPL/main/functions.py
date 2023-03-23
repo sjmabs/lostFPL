@@ -9,8 +9,12 @@ def finished_week():
     gws1 = gws['events']
     latest_finished_gw = 0
     for gw in gws1:
-        if gw['is_current']:
+        if gw['is_current'] and gw['finished']:
+            latest_finished_gw = gw['id']
+            break
+        elif gw['is_current']:
             latest_finished_gw = gw['id'] - 1
+            break
     if latest_finished_gw == 0:
         print("off season")
         # add an off season page link
