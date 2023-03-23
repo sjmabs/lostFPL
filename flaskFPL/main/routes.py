@@ -97,7 +97,6 @@ def home():
 
         df = df1.merge(times_last_df, how="outer", right_on='Player Name', left_on='Player Name')
 
-        # df = df.merge(amount_owed_df, how="outer", right_on='Player Name', left_on='Player Name')
         if int(form.select_one.data) == 1:
             df = df.merge(amount_owed_df, how="outer", right_on='Player Name', left_on='Player Name')
             df = df.astype(
@@ -118,7 +117,6 @@ def home():
             amount_owed_df = amount_owed_df.add(amount_owed_second_df, fill_value=0)
 
             df = df.merge(amount_owed_df, how="outer", right_on='Player Name', left_on='Player Name')
-            # df = second_df.merge(amount_owed_second_df, how="outer", right_on='Player Name', left_on='Player Name')
             df = df.astype(
                 {"ID": "int", "Rank": "int", "Total": "int", "Times Bottom": "int", "Times Second Bottom": "int"})
 
@@ -162,7 +160,7 @@ def home():
         df.drop("ID", inplace=True, axis=1)
 
         return render_template("fpl.html",
-                               title=f"League Data for {league_name}",
+                               title=f"League Data for {league_name} after {latest_week} games",
                                tables=[df.to_html(classes=['data', 'table-striped'], justify="center", index=False)],
                                titles=df.columns.values, form=form, all_lowest=all_lowest,
                                amount_owed=amount_owed,
@@ -177,5 +175,5 @@ def about():
 
 
 @main.route('/leagueID')
-def LeagueID():
+def league_id():
     return render_template("LeagueIDGuide.html", title="How To Find Your League ID")
