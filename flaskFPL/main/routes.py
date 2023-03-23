@@ -175,5 +175,5 @@ def about():
 
 
 @main.route('/leagueID')
-def league_id():
+def LeagueID():
     return render_template("LeagueIDGuide.html", title="How To Find Your League ID")
