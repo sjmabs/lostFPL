@@ -5,7 +5,7 @@ from collections import Counter
 
 from flaskFPL.main.functions import get_managers, get_league_data, get_amount_owed, \
     list_to_dict, latest_week, get_all_nth_lowest_players, \
-    get_all_nth_lowest_comments, get_all_nth_lowest_comments_scorer, get_all_nth_lowest_players_scorer
+    get_all_nth_lowest_comments, get_all_nth_lowest_comments_scorer, get_all_nth_lowest_players_scorer, finished_week
 
 
 from flask import render_template, flash, Blueprint
@@ -17,6 +17,11 @@ main = Blueprint('main', __name__)
 @main.route('/', methods=['GET', 'POST'])
 @main.route('/home', methods=['GET', 'POST'])
 def home():
+
+    season_started = finished_week()
+    if not season_started:
+        return render_template('errors/offseason.html')
+
     form = EnterID()
     if form.validate_on_submit():
         league_data = get_league_data(form.league_id.data)

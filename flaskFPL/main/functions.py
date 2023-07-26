@@ -1,24 +1,28 @@
 import pandas as pd
 import requests
 from flaskFPL.main.models import Manager
+from flask import render_template, abort
 
 
 # check the week has finished so that we get fully updated scores
 def finished_week():
-    gws = requests.get('https://fantasy.premierleague.com/api/bootstrap-static/').json()
-    gws1 = gws['events']
-    latest_finished_gw = 0
-    for gw in gws1:
-        if gw['is_current'] and gw['finished']:
-            latest_finished_gw = gw['id']
-            break
-        elif gw['is_current']:
-            latest_finished_gw = gw['id'] - 1
-            break
-    if latest_finished_gw == 0:
-        print("off season")
-        # add an off season page link
-    return latest_finished_gw
+    request_data = requests.get('https://fantasy.premierleague.com/api/bootstrap-static/').json()
+    gameweeks = request_data['events']
+    latest_finished_gameweek = 0
+
+    # if first week is not finished we can break as it's off season still
+    if not gameweeks[0]['finished']:
+        return latest_finished_gameweek
+
+    # else we will loop through each week to see which week it is and return
+    for gameweek in gameweeks:
+        if gameweek['is_current']:
+            if gameweek['finished']:
+                latest_finished_gameweek = gameweek['id']
+                return latest_finished_gameweek
+            else:
+                latest_finished_gameweek = gameweek['id'] - 1
+                return latest_finished_gameweek
 
 
 latest_week = finished_week()
@@ -26,8 +30,6 @@ latest_week = finished_week()
 
 # gets the league name and table
 def get_league_data(lid=0):
-    if lid == 0:
-        lid = input("Enter league ID: ")
     r = requests.get("https://fantasy.premierleague.com/api/" + "leagues-classic/" + str(lid) + "/standings/").json()
     league = r['league']
     league_name = league['name']
@@ -48,11 +50,11 @@ def get_league_data(lid=0):
     return league_data
 
 
-def get_managers(lid=654321):
-    if lid == 0:
-        lid = input("Enter league ID: ")
+def get_managers(lid=0):
     r = requests.get("https://fantasy.premierleague.com/api/" + "leagues-classic/" + str(lid) + "/standings/").json()
     teams = r['standings']
+
+    # using the model I created I can loop through each manager in the request above and add to a list of managers
     managers = [Manager(manager['player_name'], manager['entry_name'], manager['entry'],
                         manager['total'], manager['rank'],
                         get_gw_scores(manager['entry'])) for manager in teams['results']]
@@ -60,10 +62,8 @@ def get_managers(lid=654321):
 
 
 def get_gw_scores(uid=0):
-    if uid == 0:
-        uid = input("Enter a User ID: ")
-    rg = requests.get("https://fantasy.premierleague.com/api/" + "/entry/" + str(uid) + "/history/").json()
-    gameweeks = rg['current']
+    r = requests.get("https://fantasy.premierleague.com/api/" + "/entry/" + str(uid) + "/history/").json()
+    gameweeks = r['current']
     gw_scores = {"GW" + str(week['event']): week['points'] for week in gameweeks}
     if list(gw_scores)[-1] != f"GW{latest_week}":
         gw_scores.popitem()
@@ -76,19 +76,21 @@ def get_gw_scores(uid=0):
 
 
 # find the lowest score and name or number of players the user enters in their selection for the given gw
-def get_nth_lowest_info(all_managers, gw=latest_week, n=0):
-    gw_scores = []
-    # retrieve all players scores for the week
-    for man in all_managers:
-        gw_scores.append(man.scores[f"GW{gw}"])
-    # sort them lowest => highest
-    gw_scores.sort()
-    # remove duplicates
+def get_nth_lowest_info(all_managers, gw=latest_week, players_to_identify=0):
+    lowest_info = []
+    lowest_info_list = []
+    lowest_player = []
+    for manager in all_managers:
+        binary_search_insert(lowest_info, manager, gw)
+        if len(lowest_info) > players_to_identify:
+            if lowest_info[-1]["score"] != lowest_info[-2]["score"]:
+                lowest_info.pop()
+
+    gw_scores = [item["scores"] for item in lowest_info]
     gw_scores = list(dict.fromkeys(gw_scores))
 
-    lowest_info_list = []
     x = 0
-    while x <= int(n):
+    while x <= int(players_to_identify):
         # check if list has enough for our requirement and if not assign None
         if len(gw_scores) <= x:
             nth_lowest_score = None
@@ -96,19 +98,20 @@ def get_nth_lowest_info(all_managers, gw=latest_week, n=0):
         else:
             # else assign the x index score in the list
             nth_lowest_score = gw_scores[x]
-        lowest_player = []
+
         # check if lowest_score exists and if not then nobody is lowest for that specific position
         if nth_lowest_score is None:
             lowest_player = ["Nobody"]
         # else we look at all managers and see who has the lowest score and add their name to the lowest player list
         else:
-            for man in all_managers:
-                if man.scores[f"GW{gw}"] == nth_lowest_score:
-                    lowest_player.append(man.name)
+            for player in lowest_info:
+                if player.score == nth_lowest_score:
+                    lowest_player.append(player.name)
+                    lowest_info.remove(player)
                 else:
                     pass
-        lowest_info = {f'{x}lowest_score': nth_lowest_score, f'{x}lowest_player': lowest_player}
-        lowest_info_list.append(lowest_info)
+        lowest_info_statement = {f'{x}lowest_score': nth_lowest_score, f'{x}lowest_player': lowest_player}
+        lowest_info_list.append(lowest_info_statement)
         x += 1
     lowest_info_list.append({'gw': gw})
     return lowest_info_list
@@ -340,4 +343,29 @@ def get_all_nth_lowest_comments_scorer(all_managers, current_gw=latest_week, n=0
             x += 1
         gw += 1
     return final_list
+
+
+# can i accomplish this in one loop? Look at managers gw score, if list is < n:
+# compare score to  list[n/2] (middle item) and **BINARY SEARCH TO FIND INSERTION point**
+# if the score is the same
+
+
+
+
+
+def binary_search_insert(lowest_info, manager, gw=latest_week):
+    low = 0
+    high = len(lowest_info)
+    while low <= high:
+        mid = (low + high) // 2
+        if lowest_info[mid]["score"] == manager.scores[f"GW{gw}"]:
+            return lowest_info.insert(mid, {"score": manager.scores[f"GW{gw}"], "name": manager.name})
+        elif lowest_info[mid]["score"] < manager.scores[f"GW{gw}"]:
+            low = mid + 1
+        else:
+            high = mid - 1
+    return lowest_info.insert(low, {"score": manager.scores[f"GW{gw}"], "name": manager.name})
+
+
+
 

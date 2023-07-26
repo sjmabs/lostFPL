@@ -18,3 +18,7 @@ def error_403(error):
 def error_500(error):
     return render_template('errors/500.html'), 500
 
+
+@errors.errorhandler(404)
+def offseason(error):
+    return render_template('errors/offseason.html'), 404
