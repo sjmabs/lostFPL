@@ -54,7 +54,6 @@ def home():
                     times_third_last = list_to_dict(all_third_lowest)
                     amount_owed_third_last = get_amount_owed(times_third_last, form.amount_owed_3.data)
 
-        # need to fix this section next and fix the SCORER functions
         else:
 
             all_comments = get_all_nth_lowest_comments_scorer(all_managers, latest_week, (int(form.select_one.data) - 1))
@@ -89,8 +88,7 @@ def home():
                         + Counter(amount_owed_second_last)
                         + Counter(amount_owed_third_last))
 
-        # make a table based on amounts owed per player
-
+        # make a table based on amounts owed per player - can turn this into a function for better readability
         amount_owed_df = pd.DataFrame.from_dict(amount_owed_last, orient='index', columns=["Amount Owed"])
 
         # rename column
@@ -162,7 +160,7 @@ def home():
                  "Times Third Bottom": "int"})
 
         df = df.fillna(0)
-        df = df[df["Player Name"].str.contains("Nobody") == False]
+        df = df[df["Player Name"].str.contains("Nobody") is False]
         df.drop("ID", inplace=True, axis=1)
 
         return render_template("fpl.html",
