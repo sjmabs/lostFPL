@@ -1,12 +1,11 @@
 import pandas as pd
 import requests
 from flaskFPL.main.models import Manager
-from flask import render_template, abort
 
 
 # check the week has finished so that we get fully updated scores
 def finished_week():
-    request_data = requests.get('https://fantasy.premierleague.com/api/bootstrap-static/').json()
+    request_data = requests.get('https://fantasy.premierleague.com/api/bootstrap-static/', verify=False).json()
     gameweeks = request_data['events']
     latest_finished_gameweek = 0
 
@@ -25,7 +24,7 @@ def finished_week():
                 return latest_finished_gameweek
 
 
-latest_week = finished_week()
+# latest_week = finished_week()
 
 
 # gets the league name and table
@@ -76,7 +75,7 @@ def get_gw_scores(uid=0):
 
 
 # find the lowest score and name or number of players the user enters in their selection for the given gw
-def get_nth_lowest_info(all_managers, gw=latest_week, players_to_identify=0):
+def get_nth_lowest_info(all_managers, gw=finished_week(), players_to_identify=0):
     lowest_info = []
     lowest_info_list = []
     lowest_player = []
@@ -165,7 +164,7 @@ def get_nth_lowest_score_comments(all_managers, gw, n):
 
 
 # returns a list of lists of players names every time they came nth last. each nth index of list relates to the place
-def get_all_nth_lowest_players(all_managers, current_gw=latest_week, n=0):
+def get_all_nth_lowest_players(all_managers, current_gw=finished_week(), n=0):
     final_list = []
     gw = 1
     # loop through each week
@@ -185,11 +184,11 @@ def get_all_nth_lowest_players(all_managers, current_gw=latest_week, n=0):
     return final_list
 
 
-def get_all_nth_lowest_comments(all_managers, current_gw=latest_week, n=0):
+def get_all_nth_lowest_comments(all_managers, current_gw=finished_week(), n=0):
     final_list = []
     gw = 1
     # loop through each week
-    while gw <= latest_week:
+    while gw <= current_gw:
         x = 0
         # get information on where they came for each week
         # info = data
@@ -220,7 +219,7 @@ def get_amount_owed(a_dict, price=0):
     return new_dict
 
 
-def get_nth_lowest_info_scorer(all_managers, gw=latest_week, n=0):
+def get_nth_lowest_info_scorer(all_managers, gw=finished_week(), n=0):
     lowest_players = []
     if n == 0:
         return get_nth_lowest_info(all_managers, gw, n)
@@ -251,7 +250,7 @@ def get_nth_lowest_info_scorer(all_managers, gw=latest_week, n=0):
     return info
 
 
-def get_nth_lowest_score_comments_scorer(all_managers, gw=latest_week, n=0):
+def get_nth_lowest_score_comments_scorer(all_managers, gw=finished_week(), n=0):
     lowest_info = get_nth_lowest_info_scorer(all_managers, gw, n)
     x = 0
     lowest_player_comments = []
@@ -301,7 +300,7 @@ def get_nth_lowest_score_comments_scorer(all_managers, gw=latest_week, n=0):
     return lowest_player_comments
 
 
-def get_all_nth_lowest_players_scorer(all_managers, current_gw=latest_week, n=0):
+def get_all_nth_lowest_players_scorer(all_managers, current_gw=finished_week(), n=0):
     final_list = []
     gw = 1
     # loop through each week
@@ -326,12 +325,12 @@ def get_all_nth_lowest_players_scorer(all_managers, current_gw=latest_week, n=0)
     return final_list
 
 
-def get_all_nth_lowest_comments_scorer(all_managers, current_gw=latest_week, n=0):
+def get_all_nth_lowest_comments_scorer(all_managers, current_gw=finished_week(), n=0):
     final_list = []
     gw = 1
     # loop through each week
 
-    while gw <= latest_week:
+    while gw <= current_gw:
         x = 0
         # get information on where they came for each week
         info = get_nth_lowest_score_comments_scorer(all_managers, gw, n) # returns dictionaries of all lowest people i asked for.
@@ -345,15 +344,7 @@ def get_all_nth_lowest_comments_scorer(all_managers, current_gw=latest_week, n=0
     return final_list
 
 
-# can i accomplish this in one loop? Look at managers gw score, if list is < n:
-# compare score to  list[n/2] (middle item) and **BINARY SEARCH TO FIND INSERTION point**
-# if the score is the same
-
-
-
-
-
-def binary_search_insert(lowest_info, manager, gw=latest_week):
+def binary_search_insert(lowest_info, manager, gw=finished_week()):
     low = 0
     high = len(lowest_info)
     while low <= high:

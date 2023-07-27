@@ -4,7 +4,7 @@ import pandas as pd
 from collections import Counter
 
 from flaskFPL.main.functions import get_managers, get_league_data, get_amount_owed, \
-    list_to_dict, latest_week, get_all_nth_lowest_players, \
+    list_to_dict, get_all_nth_lowest_players, \
     get_all_nth_lowest_comments, get_all_nth_lowest_comments_scorer, get_all_nth_lowest_players_scorer, finished_week
 
 
@@ -24,6 +24,7 @@ def home():
 
     form = EnterID()
     if form.validate_on_submit():
+        latest_week = season_started
         league_data = get_league_data(form.league_id.data)
         # league name for showing on page
         league_name = league_data['league_name']
