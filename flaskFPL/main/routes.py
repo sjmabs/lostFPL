@@ -99,6 +99,7 @@ def home():
 
         if int(form.select_one.data) == 1:
             df = df.merge(amount_owed_df, how="outer", right_on='Player Name', left_on='Player Name')
+            df = df.fillna(0)
             df = df.astype(
                 {"ID": "int", "Rank": "int", "Total": "int", "Times Bottom": "int"})
         elif int(form.select_one.data) == 2:
@@ -117,6 +118,9 @@ def home():
             amount_owed_df = amount_owed_df.add(amount_owed_second_df, fill_value=0)
 
             df = df.merge(amount_owed_df, how="outer", right_on='Player Name', left_on='Player Name')
+
+            df = df.fillna(0)
+
             df = df.astype(
                 {"ID": "int", "Rank": "int", "Total": "int", "Times Bottom": "int", "Times Second Bottom": "int"})
 
@@ -150,6 +154,7 @@ def home():
 
             df = third_df.merge(amount_owed_df, how="outer",
                                 right_on='Player Name', left_on='Player Name')
+            df = df.fillna(0)
 
             df = df.astype(
                 {"ID": "int", "Rank": "int", "Total": "int", "Times Bottom": "int", "Times Second Bottom": "int",
